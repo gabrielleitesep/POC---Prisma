@@ -1,6 +1,6 @@
 import joi from "joi";
 import { Request, Response } from "express";
-import { connectionDB } from "../db/db.js";
+import prisma from "../db/db.js";
 
 const booksJOI = joi.object({
     title: joi.string().required(),

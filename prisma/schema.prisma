@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model books {
+  id        Int       @id @default(autoincrement())
+  title     String
+  author    String
+  genre_id  Int?
+  contry_id Int?
+  contries  contries? @relation(fields: [contry_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  genres    genres?   @relation(fields: [genre_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model contries {
+  id     Int     @id @default(autoincrement())
+  contry String
+  books  books[]
+}
+
+model genres {
+  id    Int     @id @default(autoincrement())
+  genre String
+  books books[]
+}
