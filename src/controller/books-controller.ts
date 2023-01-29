@@ -4,18 +4,23 @@ import prisma from "../db/db.js";
 
 const booksJOI = joi.object({
     title: joi.string().required(),
-    author: joi.string().required()
+    author: joi.string().required(),
+    genre_id: joi.number().required().integer().min(1),
+    country_id: joi.number().required().integer().min(1)
 })
 
 type Book = {
     title: string;
     author: string;
+    genre_id: number;
+    contry_id: number;
+
 }
 
 
 export async function postBook (req: Request, res: Response){
 
-    const {title, author} = req.body as Book
+    const {title, author, genre_id, contry_id} = req.body as Book
     const validacao = booksJOI.validate(req.body, { abortEarly: false });
     
     if (validacao.error) {
@@ -26,7 +31,14 @@ export async function postBook (req: Request, res: Response){
 
     try {
 
-        await connectionDB.query(`INSERT INTO books ("title", "author") VALUES ($1, $2);`, [title, author]);
+        await prisma.books.create({
+            data: {
+                title,
+                author,
+                genre_id,
+                contry_id
+            }
+        });
         res.status(201).send("Livro adicionado!");
 
     } catch (err) {
@@ -38,13 +50,13 @@ export async function postBook (req: Request, res: Response){
 export async function getBooks (req: Request, res: Response){
 
     try {
-        const books = await connectionDB.query(`SELECT * FROM books;`);
+        const books = await prisma.books.findMany;
 
-        if (!books.rows[0]) {
+        if (!books) {
             return res.status(404).send("Não existe nenhum livro cadastrado ainda!");
         }
 
-        res.status(200).send(books.rows);
+        res.status(200).send(books);
 
     } catch (err) {
         console.log(err);
@@ -57,13 +69,13 @@ export async function getBookById (req: Request, res: Response){
     const { id } = req.params;
 
     try {
-        const activeBook = await connectionDB.query(`SELECT * FROM books WHERE id=$1;`, [id]);
+        const activeBook = await prisma.books.findFirst({where: {id}});
 
-        if (!activeBook.rows[0]) {
+        if (!activeBook) {
             return res.status(404).send("Esse livro não existe!");
         }
 
-        res.status(200).send(activeBook.rows);
+        res.status(200).send(activeBook);
 
     } catch (err) {
         console.log(err);
@@ -74,7 +86,7 @@ export async function getBookById (req: Request, res: Response){
 export async function updateBookById (req: Request, res: Response){
 
     const { id } = req.params;
-    const {title, author} = req.body as Book
+    const {title, author, genre_id, contry_id} = req.body as Book
     const validacao = booksJOI.validate(req.body, { abortEarly: false });
     
     if (validacao.error) {
@@ -85,13 +97,13 @@ export async function updateBookById (req: Request, res: Response){
 
     try {
 
-        const activeBook = await connectionDB.query(`SELECT * FROM books WHERE id=$1;`, [id])
+        const activeBook = await prisma.books.findFirst({where: {id}});
         
-        if(!activeBook.rows[0]){
+        if(!activeBook){
             return res.status(404).send("Esse livro não existe!");
         }
 
-        await connectionDB.query(`UPDATE books SET title=$1, author=$2 WHERE id=$3;`, [title, author, id]);
+        await prisma.books.update({where: {id}, data: {title, author, genre_id, contry_id}});
         res.status(204).send("Livro atualizado com sucesso!");
 
     } catch (error) {
@@ -106,13 +118,13 @@ export async function deleteBookById (req: Request, res: Response){
 
     try {
 
-        const activeBook = await connectionDB.query(`SELECT * FROM books WHERE id=$1;`, [id])
+        const activeBook = await prisma.books.findFirst({where: {id}});
         
-        if(!activeBook.rows[0]){
+        if(!activeBook){
             return res.status(404).send("Livro não encontrado!");
         }
 
-        await connectionDB.query(`DELETE FROM books WHERE id=$1;`, [id]);
+        await prisma.books.delete({where: {id}})
         res.status(204).send("Livro excluído com sucesso!");
 
     } catch (error) {
