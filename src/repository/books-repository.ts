@@ -8,11 +8,12 @@ export async function insertBook(title: string, author: string, genre_id: number
             genre_id,
             contry_id
         }
-    });;
+    });
 }
 
 export async function readBooks() {
-    return prisma.books.findMany;
+    const data = prisma.books.findMany();
+    return data
 }
 
 export async function readBookId(id: number) {

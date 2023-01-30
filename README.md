@@ -30,3 +30,5 @@ DELETE: "/book/:id"
 2- Create a Postgres database.
 3- Create the .env file with the .env.example according informations.
 4- Run npm run dev.
+5- Run all migrations
+6- Run seed
