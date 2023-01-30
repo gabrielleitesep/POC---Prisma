@@ -5,8 +5,8 @@ import { alterBook, excludeBook, insertBook, readBookId, readBooks } from "../re
 const booksJOI = joi.object({
     title: joi.string().required(),
     author: joi.string().required(),
-    genre_id: joi.number().required().integer().min(1),
-    country_id: joi.number().required().integer().min(1)
+    genre_id: joi.number().required().integer().min(1).max(6),
+    country_id: joi.number().required().integer().min(1).max(6)
 });
 
 type Book = {
