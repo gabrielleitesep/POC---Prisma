@@ -6,7 +6,7 @@ const booksJOI = joi.object({
     title: joi.string().required(),
     author: joi.string().required(),
     genre_id: joi.number().required().integer().min(1).max(6),
-    country_id: joi.number().required().integer().min(1).max(6)
+    contry_id: joi.number().required().integer().min(1).max(6)
 });
 
 type Book = {
